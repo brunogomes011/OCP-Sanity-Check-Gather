@@ -226,7 +226,7 @@ function check_ocp_routes_routers_incluster {
 }
 
 
-printf "Starting the ocp-sanity-check-gather script... All tests are going to run $ATTEMPT time(s)  \n"
+printf "Starting the ocp-sanity-check-gather script... All tests are going to run $CONN_ATTEMPT time(s)  \n"
 check_dns_resolution_inbastion
 check_dns_resolution_incluster 
 check_dns_resolution_per_upstream_inbastion
