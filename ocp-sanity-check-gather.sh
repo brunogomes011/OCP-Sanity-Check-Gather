@@ -1,15 +1,16 @@
 #!/bin/bash
 
 
-API=$(oc get infrastructure -oyaml | grep apiServerURL | cut -d "/" -f 3 | cut -d ":" -f1)
-API_INT=$(oc get infrastructure -oyaml | grep apiServerInternalURI | cut -d "/" -f 3 | cut -d ":" -f1)
-INGRESS_URL="*."$(oc get ingresscontroller -n openshift-ingress-operator default -oyaml | grep domain | awk '{print $2}')
+BASE_DOMAIN=$(oc get dns/cluster -oyaml | grep baseDomain | awk '{print $2}')
+API=api.$BASE_DOMAIN
+API_INT=api-int.$BASE_DOMAIN
+INGRESS_URL="*.apps."$BASE_DOMAIN
 ROUTERS_IPS=$(oc get pod -n openshift-ingress -owide | grep -v NAME | awk '{print $6}')
-DNS_UPSTREAMS=$(oc debug node/$(oc get nodes | grep 'Ready ' | head -n1| awk '{print $1}') -- chroot /host cat /etc/resolv.conf | grep nameserver | awk '{print $2}')
+DNS_UPSTREAMS=$(oc debug -q node/$(oc get nodes | grep 'Ready ' | head -n1| awk '{print $1}') -- chroot /host cat /etc/resolv.conf | grep nameserver | awk '{print $2}')
 ALL_URLS=("$API" "$API_INT" "$INGRESS_URL")
-ALL_OCP_ROUTES=$(oc get routes -A | awk {'print $3'} | grep -E 'console-openshift|canary-openshift|oauth-openshift')
+ALL_OCP_ROUTES=("oauth-openshift.apps.$BASE_DOMAIN" "console-openshift-console.apps.$BASE_DOMAIN" "canary-openshift-ingress-canary.apps.$BASE_DOMAIN" )
 USER_CUSTOM_ATTEMPT=$1
-CONN_ATTEMPT="${USER_CUSTOM_ATTEMPT:=3}"
+CONN_ATTEMPT="${USER_CUSTOM_ATTEMPT:=1}"
 TEST_POD_NS=openshift-ingress-operator
 TEST_POD_CONTAINER=ingress-operator
 TEST_POD=$(oc get pod -n $TEST_POD_NS | grep -v NAME | awk '{print $1}')
