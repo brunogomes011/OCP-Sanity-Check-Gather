@@ -144,7 +144,7 @@ function check_ocp_routes_inbastion {
     for (( ATTEMPT=$CONN_ATTEMPT; ATTEMPT >= 1; ATTEMPT-- ))
     do 
     printf '####### \n'
-    printf "The OCP routes check is going to be tested $ATTEMPT time(s) \n"
+    printf "The OCP routes check inbastion is going to be tested $ATTEMPT time(s) \n"
     printf '####### \n\n'
     for ROUTE in ${ALL_OCP_ROUTES[@]}
     do
@@ -164,7 +164,7 @@ function check_ocp_routes_routers_inbastion {
     for (( ATTEMPT=$CONN_ATTEMPT; ATTEMPT >= 1; ATTEMPT-- ))
     do 
     printf '####### \n'
-    printf "The OCP routes check is going to be tested $ATTEMPT time(s) \n"
+    printf "The OCP routes check inbastion with resolve is going to be tested $ATTEMPT time(s) \n"
     printf '####### \n\n'
     for ROUTE in ${ALL_OCP_ROUTES[@]}
     do
@@ -187,7 +187,7 @@ function check_ocp_routes_incluster {
     for (( ATTEMPT=$CONN_ATTEMPT; ATTEMPT >= 1; ATTEMPT-- ))
     do 
     printf '####### \n'
-    printf "The OCP routes check is going to be tested $ATTEMPT time(s) \n"
+    printf "The OCP routes check in cluster is going to be tested $ATTEMPT time(s) \n"
     printf '####### \n\n'
     for ROUTE in ${ALL_OCP_ROUTES[@]}
     do
@@ -207,7 +207,7 @@ function check_ocp_routes_routers_incluster {
     for (( ATTEMPT=$CONN_ATTEMPT; ATTEMPT >= 1; ATTEMPT-- ))
     do 
     printf '####### \n'
-    printf "The OCP routes check is going to be tested $ATTEMPT time(s) \n"
+    printf "The OCP routes check incluster with resolve is going to be tested $ATTEMPT time(s) \n"
     printf '####### \n\n'
     for ROUTE in ${ALL_OCP_ROUTES[@]}
     do
@@ -226,7 +226,7 @@ function check_ocp_routes_routers_incluster {
 }
 
 
-
+printf "Starting the ocp-sanity-check-gather script... All tests are going to run $ATTEMPT time(s)  \n"
 check_dns_resolution_inbastion
 check_dns_resolution_incluster 
 check_dns_resolution_per_upstream_inbastion
