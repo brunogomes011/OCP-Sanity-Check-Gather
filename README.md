@@ -8,12 +8,12 @@ In summary, the tool collects all crucial URLs from kube-apiserver and default i
 
 ### Test details
 
-- A DNS resolution test is done against api.<domain> and *.apps.<domain> from bastion host with Dig application
-- A DNS resolution test is done against api.<domain>, api-int.<domain> and *.apps.<domain> within a test pod running in the target cluster with Dig application. The URLs are tested against all DNS upstream servers configured in all nodes
-- All critical routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) from default ingress controller are tested within bastion host 
-- All critical routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) from default ingress controller are tested within bastion host against the router pods. 
-- All critical routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) from default ingress controller are tested within a test pod running in the clusterNetwork.
-- All critical routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) from default ingress controller are tested within a test pod running in the clusterNetwork against the router pods. 
+- DNS resolution test for api.<domain> and *.apps.<domain> URLs from bastion host with dig application
+- DNS resolution test for api.<domain>, api-int.<domain> and *.apps.<domain> URLs within a test pod running in the target cluster with dig application. The URLs are tested against all DNS upstream servers configured in all nodes
+- Cluster routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) from default ingress controller are tested within bastion host 
+- Cluster routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) from default ingress controller are tested within bastion host against the router pods. 
+- Cluster routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) from default ingress controller are tested within a test pod running in the clusterNetwork.
+- Cluster routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) from default ingress controller are tested within a test pod running in the clusterNetwork against the router pods. 
 
 ### Usage
 
