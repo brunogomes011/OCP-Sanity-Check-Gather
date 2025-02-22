@@ -108,7 +108,7 @@ function check_ocp_routes_incluster {
     for ROUTE in ${ALL_OCP_ROUTES[@]}
     do
         RESULT=$(oc exec -c $TEST_POD_CONTAINER -n $TEST_POD_NS $TEST_POD -- curl --connect-timeout $TIMEOUT --noproxy '*' -k -w "dnslookup: %{time_namelookup} | connect: %{time_connect} | appconnect: %{time_appconnect} | pretransfer: %{time_pretransfer} | starttransfer: %{time_starttransfer} | total: %{time_total} | size: %{size_download} | response: %{response_code} | local-port: %{local_port}\n" -o /dev/null -s "https://$ROUTE/healthz") 
-        printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - $TEST_POD | Target - $ROUTE | $RESULT \n"
+        printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - $TEST_POD_NS/$TEST_POD | Target - $ROUTE | $RESULT \n"
         sleep 0.5
     done
     printf "\n"
@@ -126,7 +126,7 @@ function check_ocp_routes_routers_incluster {
             for ROUTER_IP in ${ROUTERS_IPS[@]}
             do
                 RESULT=$(oc exec -c $TEST_POD_CONTAINER -n $TEST_POD_NS $TEST_POD -- curl --connect-timeout $TIMEOUT --noproxy '*' -k -w "dnslookup: %{time_namelookup} | connect: %{time_connect} | appconnect: %{time_appconnect} | pretransfer: %{time_pretransfer} | starttransfer: %{time_starttransfer} | total: %{time_total} | size: %{size_download} | response: %{response_code} | local-port: %{local_port}\n" -o /dev/null -s "https://$ROUTE/healthz" --resolve "$ROUTE:443:$ROUTER_IP") 
-                printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - $TEST_POD | Target - $ROUTE | Target router IP - $ROUTER_IP |  $RESULT \n"
+                printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - $TEST_POD_NS/$TEST_POD | Target - $ROUTE | Target router IP - $ROUTER_IP |  $RESULT \n"
             done
     done
     printf "\n"
@@ -145,16 +145,16 @@ if [[ -s errors.txt ]]; then
     exit 1;
 fi
 printf "DNS resolution check within bastion host  \n"
-check_dns_resolution_inbastion  > output_test.log 
-printf "DNS resolution check within the test pod $TEST_POD \n"
-check_dns_resolution_per_upstream_incluster  > output_test.log 
+check_dns_resolution_inbastion
+printf "DNS resolution check within the test pod $TEST_POD_NS/$TEST_POD \n"
+check_dns_resolution_per_upstream_incluster  > output_test_$(date +%d_%m_%Y-%H_%M_%S-%Z).log 
 printf "Route sanity check within bastion host \n"
 check_ocp_routes_inbastion  >> output_test.log 
 printf "Route sanity check within bastion host against router pods \n"
-check_ocp_routes_routers_inbastion  >> output_test.log 
-printf "Route sanity check within test pod $TEST_POD \n"
-check_ocp_routes_incluster  >> output_test.log 
-printf "Route sanity check within test pod $TEST_POD against router pods \n"
+check_ocp_routes_routers_inbastion  >> output_test_$(date +%d_%m_%Y-%H_%M_%S-%Z).log 
+printf "Route sanity check within test pod $TEST_POD_NS/$TEST_POD \n"
+check_ocp_routes_incluster  >> output_test_$(date +%d_%m_%Y-%H_%M_%S-%Z).log 
+printf "Route sanity check within test pod $TEST_POD_NS/$TEST_POD against router pods \n"
 check_ocp_routes_routers_incluster  >> output_test.log 
 rm -f errors.txt
 
