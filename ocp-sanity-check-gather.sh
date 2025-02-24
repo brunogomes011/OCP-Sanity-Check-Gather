@@ -145,9 +145,9 @@ if [[ -s errors.txt ]]; then
     exit 1;
 fi
 printf "DNS resolution check within bastion host  \n"
-check_dns_resolution_inbastion
+check_dns_resolution_inbastion > output_test_$(date +%d_%m_%Y-%H_%M_%S-%Z).log 
 printf "DNS resolution check within the test pod $TEST_POD_NS/$TEST_POD \n"
-check_dns_resolution_per_upstream_incluster  > output_test_$(date +%d_%m_%Y-%H_%M_%S-%Z).log 
+check_dns_resolution_per_upstream_incluster  >> output_test_$(date +%d_%m_%Y-%H_%M_%S-%Z).log 
 printf "Route sanity check within bastion host \n"
 check_ocp_routes_inbastion  >> output_test.log 
 printf "Route sanity check within bastion host against router pods \n"
