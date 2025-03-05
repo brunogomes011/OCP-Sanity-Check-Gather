@@ -16,12 +16,13 @@ function build_env_vars {
     TEST_POD_CONTAINER=ingress-operator
     TEST_POD=$(oc get pod -n $TEST_POD_NS | grep -v NAME | awk '{print $1}')
     TIMEOUT=10
-
+    TIMESTAMP=$(date +%d_%m_%Y-%H_%M_%S-%Z).log 
+    OUTPUT_FILE=output_result
 
 }
 
 function check_dns_resolution_inbastion {
-
+    printf "DNS resolution check within bastion host  \n" >> ${FUNCNAME[0]}_$TIMESTAMP
     for (( ATTEMPT=$CONN_ATTEMPT; ATTEMPT >= 1; ATTEMPT-- ))
     do 
     for URL in ${ALL_URLS[@]}
@@ -34,7 +35,7 @@ function check_dns_resolution_inbastion {
         DIG_ANSWER=$(echo $DIG_OUTPUT | tr -s ';' '\n' | grep 'ANSWER SECTION' | awk '{print $7}')
         DIG_STATUS=$(echo $DIG_OUTPUT | tr -s ';' '\n' | grep 'status:' | cut -d "," -f2 | awk '{print $2}')
         DIG_TIME=$(echo $DIG_OUTPUT | tr -s ';' '\n' | grep 'Query time' | awk '{print $3 " " $4}')
-        printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - bastion | Target URL - $URL | DNS answer - ${DIG_ANSWER:="NOK!"} | DNS server - ${DIG_SERVER:="NOK!"} | Query status - ${DIG_STATUS:="NOK!"} | Query time - ${DIG_TIME:="NOK!"} \n"
+        printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - bastion | Target URL - $URL | DNS answer - ${DIG_ANSWER:="NOK!"} | DNS server - ${DIG_SERVER:="NOK!"} | Query status - ${DIG_STATUS:="NOK!"} | Query time - ${DIG_TIME:="NOK!"} \n" >> ${FUNCNAME[0]}_$TIMESTAMP
         sleep 0.5
     done
     printf "\n"
@@ -44,7 +45,7 @@ function check_dns_resolution_inbastion {
 }
 
 function check_dns_resolution_per_upstream_incluster  {
-
+    printf "DNS resolution check within the test pod $TEST_POD_NS/$TEST_POD \n" >> ${FUNCNAME[0]}_$TIMESTAMP
     for (( ATTEMPT=$CONN_ATTEMPT; ATTEMPT >= 1; ATTEMPT-- ))
     do 
     for URL in ${ALL_URLS[@]}
@@ -56,7 +57,7 @@ function check_dns_resolution_per_upstream_incluster  {
                 DIG_ANSWER=$(echo $DIG_OUTPUT | tr -s ';' '\n' | grep 'ANSWER SECTION' | awk '{print $7}')
                 DIG_STATUS=$(echo $DIG_OUTPUT | tr -s ';' '\n' | grep 'status:' | cut -d "," -f2 | awk '{print $2}')
                 DIG_TIME=$(echo $DIG_OUTPUT | tr -s ';' '\n' | grep 'Query time' | awk '{print $3 " " $4}')
-                printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source POD $TEST_POD_NS/$TEST_POD | Target URL - $URL | DNS answer - ${DIG_ANSWER:="NOK!"} | DNS server - ${DIG_SERVER:="NOK!"} | Query status - ${DIG_STATUS:="NOK!"} | Query time - ${DIG_TIME:="NOK!"} \n"
+                printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source POD $TEST_POD | Target URL - $URL | DNS answer - ${DIG_ANSWER:="NOK!"} | DNS server - ${DIG_SERVER:="NOK!"} | Query status - ${DIG_STATUS:="NOK!"} | Query time - ${DIG_TIME:="NOK!"} \n" >> ${FUNCNAME[0]}_$TIMESTAMP
                 sleep 0.5
             done
     done
@@ -67,13 +68,13 @@ function check_dns_resolution_per_upstream_incluster  {
 }
 
 function check_ocp_routes_inbastion {
-
+    printf "Route sanity check within bastion host \n" >> ${FUNCNAME[0]}_$TIMESTAMP
     for (( ATTEMPT=$CONN_ATTEMPT; ATTEMPT >= 1; ATTEMPT-- ))
     do 
     for ROUTE in ${ALL_OCP_ROUTES[@]}
     do
         RESULT=$(curl --connect-timeout $TIMEOUT --noproxy '*' -k -w "dnslookup: %{time_namelookup} | connect: %{time_connect} | appconnect: %{time_appconnect} | pretransfer: %{time_pretransfer} | starttransfer: %{time_starttransfer} | total: %{time_total} | size: %{size_download} | response: %{response_code} | local-port: %{local_port}\n" -o /dev/null -s "https://$ROUTE/healthz") 
-        printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - bastion | Target - $ROUTE | $RESULT \n"
+        printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - bastion | Target - $ROUTE | $RESULT \n" >> ${FUNCNAME[0]}_$TIMESTAMP
         sleep 0.5
     done
     printf "\n"
@@ -83,7 +84,7 @@ function check_ocp_routes_inbastion {
 }
 
 function check_ocp_routes_routers_inbastion {
-
+    printf "Route sanity check within bastion host against router pods \n" >> ${FUNCNAME[0]}_$TIMESTAMP
     for (( ATTEMPT=$CONN_ATTEMPT; ATTEMPT >= 1; ATTEMPT-- ))
     do 
     for ROUTE in ${ALL_OCP_ROUTES[@]}
@@ -91,7 +92,7 @@ function check_ocp_routes_routers_inbastion {
             for ROUTER_IP in ${ROUTERS_IPS[@]}
             do
                 RESULT=$(curl --connect-timeout $TIMEOUT --noproxy '*' -k -w "dnslookup: %{time_namelookup} | connect: %{time_connect} | appconnect: %{time_appconnect} | pretransfer: %{time_pretransfer} | starttransfer: %{time_starttransfer} | total: %{time_total} | size: %{size_download} | response: %{response_code} | local-port: %{local_port}\n" -o /dev/null -s "https://$ROUTE/healthz" --resolve "$ROUTE:443:$ROUTER_IP") 
-                printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - bastion | Target - $ROUTE | Target router IP - $ROUTER_IP | $RESULT \n"
+                printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - bastion | Target - $ROUTE | Target router IP - $ROUTER_IP | $RESULT \n" >> ${FUNCNAME[0]}_$TIMESTAMP
                 sleep 0.5
             done
     done
@@ -102,13 +103,13 @@ function check_ocp_routes_routers_inbastion {
 }
 
 function check_ocp_routes_incluster {
-
+    printf "Route sanity check within test pod $TEST_POD_NS/$TEST_POD \n" >> ${FUNCNAME[0]}_$TIMESTAMP
     for (( ATTEMPT=$CONN_ATTEMPT; ATTEMPT >= 1; ATTEMPT-- ))
     do 
     for ROUTE in ${ALL_OCP_ROUTES[@]}
     do
         RESULT=$(oc exec -c $TEST_POD_CONTAINER -n $TEST_POD_NS $TEST_POD -- curl --connect-timeout $TIMEOUT --noproxy '*' -k -w "dnslookup: %{time_namelookup} | connect: %{time_connect} | appconnect: %{time_appconnect} | pretransfer: %{time_pretransfer} | starttransfer: %{time_starttransfer} | total: %{time_total} | size: %{size_download} | response: %{response_code} | local-port: %{local_port}\n" -o /dev/null -s "https://$ROUTE/healthz") 
-        printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - $TEST_POD_NS/$TEST_POD | Target - $ROUTE | $RESULT \n"
+        printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - $TEST_POD | Target - $ROUTE | $RESULT \n" >> ${FUNCNAME[0]}_$TIMESTAMP
         sleep 0.5
     done
     printf "\n"
@@ -118,7 +119,7 @@ function check_ocp_routes_incluster {
 }
 
 function check_ocp_routes_routers_incluster {
-
+    printf "Route sanity check within test pod $TEST_POD_NS/$TEST_POD against router pods \n" >> ${FUNCNAME[0]}_$TIMESTAMP
     for (( ATTEMPT=$CONN_ATTEMPT; ATTEMPT >= 1; ATTEMPT-- ))
     do 
     for ROUTE in ${ALL_OCP_ROUTES[@]}
@@ -126,7 +127,7 @@ function check_ocp_routes_routers_incluster {
             for ROUTER_IP in ${ROUTERS_IPS[@]}
             do
                 RESULT=$(oc exec -c $TEST_POD_CONTAINER -n $TEST_POD_NS $TEST_POD -- curl --connect-timeout $TIMEOUT --noproxy '*' -k -w "dnslookup: %{time_namelookup} | connect: %{time_connect} | appconnect: %{time_appconnect} | pretransfer: %{time_pretransfer} | starttransfer: %{time_starttransfer} | total: %{time_total} | size: %{size_download} | response: %{response_code} | local-port: %{local_port}\n" -o /dev/null -s "https://$ROUTE/healthz" --resolve "$ROUTE:443:$ROUTER_IP") 
-                printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - $TEST_POD_NS/$TEST_POD | Target - $ROUTE | Target router IP - $ROUTER_IP |  $RESULT \n"
+                printf "$(date +%Y-%m-%dT%H:%M:%S.%3NZ%:z) | Source device - $TEST_POD | Target - $ROUTE | Target router IP - $ROUTER_IP |  $RESULT \n" >> ${FUNCNAME[0]}_$TIMESTAMP
             done
     done
     printf "\n"
@@ -144,17 +145,18 @@ if [[ -s errors.txt ]]; then
     rm -f errors.txt
     exit 1;
 fi
-printf "DNS resolution check within bastion host  \n"
-check_dns_resolution_inbastion > output_test_$(date +%d_%m_%Y-%H_%M_%S-%Z).log 
-printf "DNS resolution check within the test pod $TEST_POD_NS/$TEST_POD \n"
-check_dns_resolution_per_upstream_incluster  >> output_test_$(date +%d_%m_%Y-%H_%M_%S-%Z).log 
-printf "Route sanity check within bastion host \n"
-check_ocp_routes_inbastion  >> output_test.log 
-printf "Route sanity check within bastion host against router pods \n"
-check_ocp_routes_routers_inbastion  >> output_test_$(date +%d_%m_%Y-%H_%M_%S-%Z).log 
-printf "Route sanity check within test pod $TEST_POD_NS/$TEST_POD \n"
-check_ocp_routes_incluster  >> output_test_$(date +%d_%m_%Y-%H_%M_%S-%Z).log 
-printf "Route sanity check within test pod $TEST_POD_NS/$TEST_POD against router pods \n"
-check_ocp_routes_routers_incluster  >> output_test.log 
+
+printf "DNS resolution checks running...  \n"
+check_dns_resolution_inbastion &
+check_dns_resolution_per_upstream_incluster &
+printf "Route checks running...  \n"
+check_ocp_routes_inbastion &
+check_ocp_routes_routers_inbastion &
+check_ocp_routes_incluster &
+check_ocp_routes_routers_incluster &
+wait
+cat *$TIMESTAMP >> $OUTPUT_FILE-$TIMESTAMP
+printf "All checks has been finished...  \n"
+rm -f check*$TIMESTAMP
 rm -f errors.txt
 
