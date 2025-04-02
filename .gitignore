@@ -1,2 +1,4 @@
 *.log
 *.txt
+outputs/*json
+outputs/*txt

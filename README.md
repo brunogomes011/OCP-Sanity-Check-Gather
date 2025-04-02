@@ -6,41 +6,36 @@ This script/tool runs a set of connectivity tests against the OCP components fro
 
 In summary, the tool collects all crucial URLs from kube-apiserver and default ingress controller components to test DNS and https connections. The general objective is trying to identify which components are able to connect each one with an unique test.
 
-### Test details
+### Application requirements
 
-1. DNS resolution test for api.<domain> and *.apps.<domain> URLs from bastion host with dig application
-2. DNS resolution test for api.<domain>, api-int.<domain> and *.apps.<domain> URLs within a test pod running in the target cluster with dig application. The URLs are tested against all DNS upstream servers configured in all nodes
-3. Cluster routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) are tested within bastion host 
-4. Cluster routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) are tested within bastion host against the router pods. 
-5. Cluster routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) are tested within a test pod running in the clusterNetwork.
-6. Cluster routes (oauth-openshift, console-openshift-console and canary-openshift-ingress-canary) are tested within a test pod running in the clusterNetwork against the router pods. 
+- Linux distribution machine
+- dig
+- curl
+- column command
+- git 
+- Openshift client (oc)
+- jq
 
 ### Usage
 
-- The test script is most effective when done from cluster's bastion host. 
-- Ensure that the source machine is installed with any Linux distribution and it is able to run shell scripts
-- Ensure that the target OCP cluster is accessible by oc commands. This means that the access has been done by oc login or any kubeconfig file.
-- Ensure that the dig and curl are also installed in the bastion host
-- Download the latest ocp-sanity-check-gather.sh file, change its permissions and run it.
+- Configure your KUBECONFIG to connect to the cluster 
+- Clone the repository 
+- Run the script. The attempt times can be controlled with number after script. See example:
 
   ~~~
-  $ curl -O https://raw.githubusercontent.com/brunogomes011/OCP-Sanity-Check-Gather/refs/heads/main/ocp-sanity-check-gather.sh
-  $ chmod u+x ocp-sanity-check-gather.sh
-  $ ./ocp-sanity-check-gather.sh
+  $ git clone https://github.com/brunogomes011/OCP-Sanity-Check-Gather.git
+  $ cd OCP-Sanity-Check-Gather && chmod u+x ocp-sanity-check-gather.sh
+  $ ./ocp-sanity-check-gather.sh 2
   ~~~
 
+### Outputs
 
-- The tool is going to test according to the number configured in the first parameter. For example: If it is expected to run the tests 10 times, the following commands should be applied:
-
-  ~~~
-  $ ./ocp-sanity-check-gather.sh 10
-  ~~~
-
-- It is a good practice to save the output in a file for better review:
+- The outputs are provided in outputs directory in json format. It is possible to run jq queris to consume the data:
 
   ~~~
-  $ ./ocp-sanity-check-gather.sh 10 >> ocp-sanity-check-gather-results.txt
+  $ cat outputs/result_ocp-sanity-check-gather-*.json | jq .
   ~~~
+
 
 - Enjoy
 
