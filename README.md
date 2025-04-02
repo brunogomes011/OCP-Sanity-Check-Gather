@@ -6,7 +6,7 @@ This script/tool runs a set of connectivity tests against the OCP components fro
 
 In summary, the tool collects all crucial URLs from kube-apiserver and default ingress controller components to test DNS and https connections. The general objective is trying to identify which components are able to connect each one with an unique test.
 
-![Demo project](helpers/demo-640.gif)
+  ![Demo project](helpers/demo-640.gif)
 
 ### Application requirements
 
