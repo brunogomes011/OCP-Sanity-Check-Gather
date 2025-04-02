@@ -6,6 +6,8 @@ This script/tool runs a set of connectivity tests against the OCP components fro
 
 In summary, the tool collects all crucial URLs from kube-apiserver and default ingress controller components to test DNS and https connections. The general objective is trying to identify which components are able to connect each one with an unique test.
 
+![Demo project](helpers/demo-640.gif)
+
 ### Application requirements
 
 - Linux distribution machine
@@ -23,9 +25,9 @@ In summary, the tool collects all crucial URLs from kube-apiserver and default i
 - Run the script. The attempt times can be controlled with number after script. See example:
 
   ~~~
-  $ git clone https://github.com/brunogomes011/OCP-Sanity-Check-Gather.git
-  $ cd OCP-Sanity-Check-Gather && chmod u+x ocp-sanity-check-gather.sh
-  $ ./ocp-sanity-check-gather.sh 2
+  git clone https://github.com/brunogomes011/OCP-Sanity-Check-Gather.git
+  cd OCP-Sanity-Check-Gather && chmod u+x ocp-sanity-check-gather.sh
+  ./ocp-sanity-check-gather.sh 2
   ~~~
 
 ### Outputs
