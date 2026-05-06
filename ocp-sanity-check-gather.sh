@@ -52,7 +52,7 @@ function check_dns_resolution_inbastion {
     printf "\n"
     sleep 0.5
     done
-    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-device","target-url","dns-answer","dns-server","query-status","query-time" -t -n ${FUNCNAME[0]} -J >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json
+    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-device","target-url","dns-answer","dns-server","query-status","query-time" -t -n ${FUNCNAME[0]} -J >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json || true
 }
 
 function check_dns_resolution_per_upstream_incluster {
@@ -74,7 +74,7 @@ function check_dns_resolution_per_upstream_incluster {
     printf "\n"
     sleep 0.5
     done
-    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-pod","target-url","dns-answer","dns-server","query-status","query-time" -t -n ${FUNCNAME[0]} -J >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json
+    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-pod","target-url","dns-answer","dns-server","query-status","query-time" -t -n ${FUNCNAME[0]} -J >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json || true
 }
 
 function check_ocp_routes_inbastion {
@@ -89,7 +89,7 @@ function check_ocp_routes_inbastion {
     printf "\n"
     sleep 0.5
     done
-    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-device","target-route","dns-lookup","connect-time","time-total","response-code","local-port" -t -n ${FUNCNAME[0]} -J >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json
+    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-device","target-route","dns-lookup","connect-time","time-total","response-code","local-port" -t -n ${FUNCNAME[0]} -J >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json || true
 
 }
 
@@ -108,7 +108,7 @@ function check_ocp_routes_routers_inbastion {
     printf "\n"
     sleep 0.5
     done
-    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-device","target-route-via-router-ip","resolver-router-ip","dns-lookup","connect-time","time-total","response-code","local-port" -t -n ${FUNCNAME[0]} -J  >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json
+    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-device","target-route-via-router-ip","resolver-router-ip","dns-lookup","connect-time","time-total","response-code","local-port" -t -n ${FUNCNAME[0]} -J  >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json || true
 }
 
 function check_ocp_routes_incluster {
@@ -123,7 +123,7 @@ function check_ocp_routes_incluster {
     printf "\n"
     sleep 0.5
     done
-    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-device","target-route","dns-lookup","connect-time","time-total","response-code","local-port" -t -n ${FUNCNAME[0]} -J >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json
+    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-device","target-route","dns-lookup","connect-time","time-total","response-code","local-port" -t -n ${FUNCNAME[0]} -J >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json || true
 }
 
 function check_ocp_routes_routers_incluster {
@@ -140,7 +140,7 @@ function check_ocp_routes_routers_incluster {
     printf "\n"
     sleep 0.5
     done
-    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-device","target-route-via-router-ip","resolver-router-ip","dns-lookup","connect-time","time-total","response-code","local-port" -t -n ${FUNCNAME[0]} -J  >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json
+    cat $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP | column -s";" --table-columns "timestamp","source-device","target-route-via-router-ip","resolver-router-ip","dns-lookup","connect-time","time-total","response-code","local-port" -t -n ${FUNCNAME[0]} -J  >> $OUTPUT_DIR/${FUNCNAME[0]}_$TIMESTAMP.json || true
 
 
 }
@@ -166,9 +166,9 @@ check_ocp_routes_routers_incluster &
 
 printf "Waiting for all subprocesses to finish... \U231B \n"
 wait
-cat $OUTPUT_DIR/*$TIMESTAMP | column -s";" -t >> $OUTPUT_DIR/$OUTPUT_FILE-$TIMESTAMP.txt
+column -s";" -t $OUTPUT_DIR/*$TIMESTAMP >> $OUTPUT_DIR/$OUTPUT_FILE-$TIMESTAMP.txt
 cat $OUTPUT_DIR/*$TIMESTAMP.json >> $OUTPUT_DIR/$OUTPUT_FILE-$TIMESTAMP.$FILE_FORMAT
-printf "All checks have been finished \U1F9D9 Check results in file ${GREEN}$OUTPUT_DIR/$OUTPUT_FILE-$TIMESTAMP.$FILE_FORMAT${ENDCOLOR} \U1F48E \n"
+printf "All checks have been finished \U1F9D9 Check results in directory ${GREEN}$OUTPUT_DIR${ENDCOLOR} \U1F48E \n"
 rm -f $OUTPUT_DIR/check*$TIMESTAMP.json $OUTPUT_DIR/check*$TIMESTAMP*
 rm -f $OUTPUT_DIR/errors.txt
 
